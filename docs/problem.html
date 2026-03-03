@@ -1,408 +1,797 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyROI — 시장 문제 정의서 v1.3</title>
-<style>
-  :root {
-    --bg: #0f1117;
-    --s1: #1a1f2e;
-    --t1: #e8eaf0;
-    --t3: #8c95aa;
-    --bd: #232b3e;
-    --blue: #4f80ff;
-    --green: #10b981;
-    --red: #f87171;
-    --amber: #fbbf24;
-    --transition: background 0.2s, color 0.2s, border-color 0.2s;
-  }
-  body.light {
-    --bg: #f5f7fa;
-    --s1: #ffffff;
-    --t1: #1a1f2e;
-    --t3: #5a6478;
-    --bd: #d1d9e6;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--t1);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    transition: var(--transition);
-    min-height: 100vh;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyROI — 시장 문제 정의서 v1.3</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --s1: #1a1f2e;
+      --t1: #e8eaf0;
+      --t3: #8c95aa;
+      --bd: #232b3e;
+      --blue: #4f80ff;
+      --green: #10b981;
+      --red: #f87171;
+      --amber: #fbbf24;
+      --transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
 
-  /* --- 1. 공통 레이아웃 클래스 추가 --- */
-  /* main과 동일한 너비 규칙을 적용할 클래스입니다 */
-  .inner-wrap {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 24px; /* main의 padding과 동일하게 맞춤 */
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  /* --- 2. Header 수정 --- */
-  header {
-    background: var(--s1);
-    border-bottom: 1px solid var(--bd);
-    /* padding: 14px 24px;  <-- 기존 패딩 삭제 (inner-wrap이 담당) */
-    padding: 14px 0;     /* 상하 패딩만 남김 */
-    
-    /* display: flex; ... <-- 기존 정렬 속성 삭제 (내부 div로 이동) */
-    display: block; 
-    
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    transition: var(--transition);
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  /* 헤더 내부의 정렬을 담당할 새로운 스타일 */
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .logo {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--blue);
-    letter-spacing: -0.5px;
-  }
-  .logo span { color: var(--t1); }
-  .badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.3px;
-  }
-  .badge-ver { background: var(--blue); color: #fff; }
-  .badge-stage { background: transparent; border: 1px solid var(--bd); color: var(--t3); }
-  .badge-scope { background: rgba(16,185,129,0.15); color: var(--green); }
+    body.light {
+      --bg: #f5f7fa;
+      --s1: #ffffff;
+      --t1: #1a1f2e;
+      --t3: #5a6478;
+      --bd: #d1d9e6;
+    }
 
-  /* TOGGLE */
-  #toggle-btn {
-    background: var(--bg);
-    border: 1px solid var(--bd);
-    color: var(--t1);
-    border-radius: 8px;
-    padding: 7px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: var(--transition);
-    white-space: nowrap;
-  }
-  #toggle-btn:hover { border-color: var(--blue); color: var(--blue); }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
- /* --- 3. Nav 수정 --- */
-  nav {
-    background: var(--s1);
-    border-bottom: 1px solid var(--bd);
-    /* padding: 0 24px; <-- 기존 패딩 삭제 */
-    padding: 0;
-    
-    /* display: flex; ... <-- 기존 정렬 속성 삭제 */
-    display: block;
-    
-    transition: var(--transition);
-  }
+    body {
+      background: var(--bg);
+      color: var(--t1);
+      font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      transition: var(--transition);
+      min-height: 100vh;
+      overflow-y: scroll;
+    }
 
-  /* 네비게이션 내부 스크롤 및 정렬 담당 */
-  .nav-content {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav-content::-webkit-scrollbar { display: none; }
-  nav::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--t3);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 12px 16px;
-    white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .tab-btn.active { border-bottom: 2px solid var(--blue); color: var(--blue); }
-  .tab-btn:hover:not(.active) { color: var(--t1); }
+    /* --- 1. 공통 레이아웃 클래스 추가 --- */
+    /* main과 동일한 너비 규칙을 적용할 클래스입니다 */
+    .inner-wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 28px;
+      width: 100%;
+      height: 100%;
+    }
 
-  /* CONTENT */
-  main { padding: 24px; max-width: 960px; margin: 0 auto; }
-  .page { display: none; }
-  .page.active { display: block; }
+    /* --- 2. Header 수정 --- */
+    header {
+      background: var(--s1);
+      border-bottom: 1px solid var(--bd);
+      padding: 13px 0;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      transition: background 0.2s;
+    }
 
-  /* CARD */
-  .card {
-    background: var(--s1);
-    border-radius: 12px;
-    padding: 18px;
-    border: 1px solid var(--bd);
-    transition: var(--transition);
-    margin-bottom: 16px;
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--t3);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card-title::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
-    height: 14px;
-    background: var(--blue);
-    border-radius: 2px;
-  }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
 
-  /* GRID */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  /* PROBLEM STATEMENT */
-  .problem-statement {
-    background: linear-gradient(135deg, rgba(79,128,255,0.12), rgba(16,185,129,0.08));
-    border: 1px solid rgba(79,128,255,0.3);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--t1);
-    line-height: 1.7;
-  }
-  .problem-statement .quote-mark { color: var(--blue); font-size: 22px; line-height: 1; }
+    .logo {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
 
-  /* KV PAIR */
-  .kv { display: flex; flex-direction: column; gap: 10px; }
-  .kv-row { display: flex; gap: 12px; align-items: flex-start; }
-  .kv-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--t3);
-    background: var(--bg);
-    border: 1px solid var(--bd);
-    border-radius: 6px;
-    padding: 2px 8px;
-    white-space: nowrap;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-  .kv-val { color: var(--t1); font-size: 13px; }
+    .logo span {
+      color: var(--blue);
+    }
 
-  /* SCOPE TABLE */
-  .scope-table { width: 100%; border-collapse: collapse; }
-  .scope-table th, .scope-table td {
-    text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--bd);
-    font-size: 13px;
-  }
-  .scope-table th { color: var(--t3); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .scope-table tr:last-child td { border-bottom: none; }
-  .in-badge { color: var(--green); font-weight: 700; }
-  .out-badge { color: var(--red); font-weight: 700; }
+    .badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
 
-  /* MARKET FUNNEL */
-  .market-funnel { display: flex; flex-direction: column; gap: 10px; }
-  .funnel-item {
-    border-radius: 10px;
-    padding: 14px 18px;
-    border: 1px solid var(--bd);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .funnel-tag {
-    font-size: 11px;
-    font-weight: 800;
-    padding: 3px 10px;
-    border-radius: 20px;
-    flex-shrink: 0;
-  }
-  .funnel-tam .funnel-tag { background: rgba(79,128,255,0.2); color: var(--blue); }
-  .funnel-sam .funnel-tag { background: rgba(16,185,129,0.2); color: var(--green); }
-  .funnel-som .funnel-tag { background: rgba(251,191,36,0.2); color: var(--amber); }
-  .funnel-tam { border-color: rgba(79,128,255,0.25); }
-  .funnel-sam { border-color: rgba(16,185,129,0.25); }
-  .funnel-som { border-color: rgba(251,191,36,0.35); }
-  .funnel-num { font-size: 20px; font-weight: 800; color: var(--t1); }
-  .funnel-desc { font-size: 12px; color: var(--t3); }
+    .badge {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      border: 1px solid var(--bd);
+      color: var(--t3);
+      background: transparent;
+      white-space: nowrap;
+    }
 
-  /* PERSONA */
-  .persona-card {
-    border-radius: 12px;
-    padding: 18px;
-    border: 1px solid var(--bd);
-    background: var(--s1);
-    height: 100%;
-  }
-  .persona-icon { font-size: 28px; margin-bottom: 10px; }
-  .persona-role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-  .persona-role.end-user { color: var(--blue); }
-  .persona-role.buyer { color: var(--green); }
-  .persona-name { font-size: 15px; font-weight: 700; color: var(--t1); margin-bottom: 12px; }
-  .persona-situation { font-size: 12px; color: var(--t3); margin-bottom: 12px; line-height: 1.6; }
-  .persona-pain {
-    background: rgba(248,113,113,0.08);
-    border: 1px solid rgba(248,113,113,0.2);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12px;
-    color: var(--t1);
-    font-style: italic;
-    line-height: 1.6;
-  }
-  .persona-pain::before { content: '"'; color: var(--red); font-size: 16px; font-style: normal; }
-  .persona-pain::after { content: '"'; color: var(--red); font-size: 16px; font-style: normal; }
+    .badge-ver {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
 
-  /* CAUSE ITEMS */
-  .cause-list { display: flex; flex-direction: column; gap: 12px; }
-  .cause-item {
-    border-radius: 10px;
-    padding: 14px 16px;
-    border: 1px solid var(--bd);
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
-  .cause-num {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(79,128,255,0.15);
-    color: var(--blue);
-    font-weight: 800;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .cause-title { font-weight: 700; color: var(--t1); margin-bottom: 4px; font-size: 13px; }
-  .cause-desc { font-size: 12px; color: var(--t3); line-height: 1.6; }
+    .badge-stage {
+      border-color: var(--green);
+      color: var(--green);
+    }
 
-  /* IMPACT TABLE */
-  .impact-table { width: 100%; border-collapse: collapse; }
-  .impact-table th, .impact-table td {
-    padding: 11px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--bd);
-    font-size: 12px;
-    vertical-align: top;
-  }
-  .impact-table th { color: var(--t3); font-weight: 600; font-size: 11px; text-transform: uppercase; background: var(--bg); }
-  .impact-table tr:last-child td { border-bottom: none; }
-  .stage-badge {
-    display: inline-block;
-    padding: 2px 9px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .stage-1 { background: rgba(79,128,255,0.15); color: var(--blue); }
-  .stage-2 { background: rgba(251,191,36,0.15); color: var(--amber); }
-  .stage-3 { background: rgba(248,113,113,0.15); color: var(--red); }
-  .impact-flow { color: var(--t1); line-height: 1.6; }
-  .impact-flow strong { color: var(--amber); }
+    .badge-scope {
+      border-color: var(--bd);
+      color: var(--t3);
+    }
 
-  /* COMPETITOR */
-  .comp-list { display: flex; flex-direction: column; gap: 10px; }
-  .comp-item { border-radius: 10px; padding: 14px 16px; border: 1px solid var(--bd); }
-  .comp-name { font-weight: 700; color: var(--t1); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-  .comp-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(79,128,255,0.12); color: var(--blue); }
-  .comp-limit { font-size: 12px; color: var(--t3); line-height: 1.6; }
-  .comp-limit strong { color: var(--t1); }
+    /* TOGGLE */
+    #toggle-btn {
+      background: var(--blue);
+      border: none;
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(79, 128, 255, 0.3);
+    }
 
-  /* VALUE PROP */
-  .value-box {
-    border-radius: 12px;
-    padding: 18px;
-    border: 1px solid var(--bd);
-    height: 100%;
-  }
-  .value-box.user-box { border-color: rgba(79,128,255,0.3); background: rgba(79,128,255,0.05); }
-  .value-box.buyer-box { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-  .value-box-title { font-weight: 700; font-size: 13px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .value-box.user-box .value-box-title { color: var(--blue); }
-  .value-box.buyer-box .value-box-title { color: var(--green); }
-  .value-item { display: flex; gap: 8px; margin-bottom: 10px; font-size: 12px; color: var(--t3); line-height: 1.6; }
-  .value-item::before { content: '→'; color: var(--blue); flex-shrink: 0; }
-  .value-box.buyer-box .value-item::before { color: var(--green); }
-  .value-item strong { color: var(--t1); }
+    #toggle-btn:hover {
+      background: #3a6bdd;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(79, 128, 255, 0.4);
+    }
 
-  /* VALIDATION */
-  .val-list { display: flex; flex-direction: column; gap: 10px; }
-  .val-item { border-radius: 10px; padding: 14px 16px; border: 1px solid var(--bd); display: flex; align-items: flex-start; gap: 14px; }
-  .val-status { font-size: 16px; flex-shrink: 0; }
-  .val-title { font-weight: 700; color: var(--t1); font-size: 13px; margin-bottom: 4px; }
-  .val-action { font-size: 12px; color: var(--t3); line-height: 1.6; }
-  .status-done { border-color: rgba(16,185,129,0.3); }
-  .status-pending { border-color: rgba(251,191,36,0.3); }
+    #toggle-btn:active {
+      transform: translateY(0);
+    }
 
-  /* SECTION TITLE */
-  .section-title { font-size: 20px; font-weight: 800; color: var(--t1); margin-bottom: 6px; }
-  .section-sub { font-size: 13px; color: var(--t3); margin-bottom: 20px; }
+    /* --- 3. Nav 수정 --- */
+    nav {
+      background: var(--s1);
+      border-bottom: 1px solid var(--bd);
+      padding: 0;
+      display: block;
+      transition: background 0.2s;
+    }
 
-  @media (max-width: 560px) {
-    main { padding: 14px; }
-    
-    /* 기존 header, nav 패딩 설정은 삭제하거나 inner-wrap으로 변경 */
-    /* header { padding: 12px 14px; }  <-- 삭제 */
-    /* nav { padding: 0 14px; }        <-- 삭제 */
-    
-    /* 대신 inner-wrap의 패딩을 줄여줍니다 */
-    .inner-wrap { padding: 0 14px; } 
-    
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .tab-btn { padding: 10px 12px; font-size: 12px; }
-  }  
-</style>
+    .nav-content {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-content .tab-btn:first-child {
+      padding-left: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--t3);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 14px 15px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+
+    .tab-btn.active {
+      border-bottom: 2px solid var(--blue);
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--t1);
+    }
+
+    /* CONTENT */
+    main {
+      padding: 36px 28px;
+      max-width: 1060px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .page {
+      display: none;
+      padding: 36px 28px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page>* {
+      max-width: 1060px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--s1);
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--bd);
+      transition: var(--transition);
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: var(--blue);
+      border-radius: 2px;
+    }
+
+    /* GRID */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* PROBLEM STATEMENT */
+    .problem-statement {
+      background: linear-gradient(135deg, rgba(79, 128, 255, 0.12), rgba(16, 185, 129, 0.08));
+      border: 1px solid rgba(79, 128, 255, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t1);
+      line-height: 1.7;
+    }
+
+    .problem-statement .quote-mark {
+      color: var(--blue);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    /* KV PAIR */
+    .kv {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .kv-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .kv-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 6px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .kv-val {
+      color: var(--t1);
+      font-size: 13px;
+    }
+
+    /* SCOPE TABLE */
+    .scope-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .scope-table th,
+    .scope-table td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--bd);
+      font-size: 13px;
+    }
+
+    .scope-table th {
+      color: var(--t3);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .scope-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .in-badge {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .out-badge {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    /* MARKET FUNNEL */
+    .market-funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .funnel-item {
+      border-radius: 10px;
+      padding: 14px 18px;
+      border: 1px solid var(--bd);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .funnel-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .funnel-tam .funnel-tag {
+      background: rgba(79, 128, 255, 0.2);
+      color: var(--blue);
+    }
+
+    .funnel-sam .funnel-tag {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+    }
+
+    .funnel-som .funnel-tag {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--amber);
+    }
+
+    .funnel-tam {
+      border-color: rgba(79, 128, 255, 0.25);
+    }
+
+    .funnel-sam {
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .funnel-som {
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+
+    .funnel-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--t1);
+    }
+
+    .funnel-desc {
+      font-size: 12px;
+      color: var(--t3);
+    }
+
+    /* PERSONA */
+    .persona-card {
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--bd);
+      background: var(--s1);
+      height: 100%;
+    }
+
+    .persona-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .persona-role {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+
+    .persona-role.end-user {
+      color: var(--blue);
+    }
+
+    .persona-role.buyer {
+      color: var(--green);
+    }
+
+    .persona-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 12px;
+    }
+
+    .persona-situation {
+      font-size: 12px;
+      color: var(--t3);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .persona-pain {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--t1);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .persona-pain::before {
+      content: '"';
+      color: var(--red);
+      font-size: 16px;
+      font-style: normal;
+    }
+
+    .persona-pain::after {
+      content: '"';
+      color: var(--red);
+      font-size: 16px;
+      font-style: normal;
+    }
+
+    /* CAUSE ITEMS */
+    .cause-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .cause-item {
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--bd);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .cause-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(79, 128, 255, 0.15);
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cause-title {
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .cause-desc {
+      font-size: 12px;
+      color: var(--t3);
+      line-height: 1.6;
+    }
+
+    /* IMPACT TABLE */
+    .impact-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .impact-table th,
+    .impact-table td {
+      padding: 11px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--bd);
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    .impact-table th {
+      color: var(--t3);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      background: var(--bg);
+    }
+
+    .impact-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .stage-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .stage-1 {
+      background: rgba(79, 128, 255, 0.15);
+      color: var(--blue);
+    }
+
+    .stage-2 {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--amber);
+    }
+
+    .stage-3 {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--red);
+    }
+
+    .impact-flow {
+      color: var(--t1);
+      line-height: 1.6;
+    }
+
+    .impact-flow strong {
+      color: var(--amber);
+    }
+
+    /* COMPETITOR */
+    .comp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comp-item {
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--bd);
+    }
+
+    .comp-name {
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comp-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(79, 128, 255, 0.12);
+      color: var(--blue);
+    }
+
+    .comp-limit {
+      font-size: 12px;
+      color: var(--t3);
+      line-height: 1.6;
+    }
+
+    .comp-limit strong {
+      color: var(--t1);
+    }
+
+    /* VALUE PROP */
+    .value-box {
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--bd);
+      height: 100%;
+    }
+
+    .value-box.user-box {
+      border-color: rgba(79, 128, 255, 0.3);
+      background: rgba(79, 128, 255, 0.05);
+    }
+
+    .value-box.buyer-box {
+      border-color: rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .value-box-title {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .value-box.user-box .value-box-title {
+      color: var(--blue);
+    }
+
+    .value-box.buyer-box .value-box-title {
+      color: var(--green);
+    }
+
+    .value-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--t3);
+      line-height: 1.6;
+    }
+
+    .value-item::before {
+      content: '→';
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .value-box.buyer-box .value-item::before {
+      color: var(--green);
+    }
+
+    .value-item strong {
+      color: var(--t1);
+    }
+
+    /* VALIDATION */
+    .val-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .val-item {
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--bd);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .val-status {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .val-title {
+      font-weight: 700;
+      color: var(--t1);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .val-action {
+      font-size: 12px;
+      color: var(--t3);
+      line-height: 1.6;
+    }
+
+    .status-done {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pending {
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 6px;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--t3);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 560px) {
+      .inner-wrap {
+        padding: 0 16px;
+      }
+
+      .page {
+        padding: 24px 16px;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="inner-wrap header-content">
-    <div class="header-left">
-      <div class="logo">My<span>ROI</span></div>
-      <span class="badge badge-ver">v1.3</span>
-      <span class="badge badge-stage">Problem-Solution Fit 탐색기</span>
-      <span class="badge badge-scope">B2B HR SaaS</span>
+  <header>
+    <div class="inner-wrap header-content">
+      <div class="header-left">
+        <div class="logo">My<span>ROI</span></div>
+        <div class="badges">
+          <span class="badge badge-ver">MVP 진행중</span>
+          <span class="badge badge-stage">Lean Startup</span>
+          <span class="badge badge-scope">B2B HR SaaS</span>
+        </div>
+      </div>
+      <button id="toggle-btn" class="toggle-btn" onclick="toggleMode()">☀️ 라이트</button>
     </div>
-    <button id="toggle-btn" onclick="toggleMode()">🌙 다크</button>
-  </div>
-</header>
+  </header>
 
-<nav>
-  <div class="inner-wrap nav-content">
-    <button class="tab-btn active" onclick="switchTab('overview')">📋 문제 개요</button>
-    <button class="tab-btn" onclick="switchTab('market')">🎯 시장 정의</button>
-    <button class="tab-btn" onclick="switchTab('persona')">👤 페르소나</button>
-    <button class="tab-btn" onclick="switchTab('evidence')">🔍 문제 근거</button>
-    <button class="tab-btn" onclick="switchTab('competitive')">⚔️ 경쟁 대안</button>
-    <button class="tab-btn" onclick="switchTab('value')">💡 비즈니스 가치</button>
-    <button class="tab-btn" onclick="switchTab('validation')">✅ 검증 현황</button>
-  </div>
-</nav>
+  <nav>
+    <div class="inner-wrap nav-content">
+      <button class="tab-btn active" onclick="switchTab('overview')">📋 문제 개요</button>
+      <button class="tab-btn" onclick="switchTab('market')">🎯 시장 정의</button>
+      <button class="tab-btn" onclick="switchTab('persona')">👤 페르소나</button>
+      <button class="tab-btn" onclick="switchTab('evidence')">🔍 문제 근거</button>
+      <button class="tab-btn" onclick="switchTab('competitive')">⚔️ 경쟁 대안</button>
+      <button class="tab-btn" onclick="switchTab('value')">💡 비즈니스 가치</button>
+      <button class="tab-btn" onclick="switchTab('validation')">✅ 검증 현황</button>
+    </div>
+  </nav>
 
-<main>
+  <!-- Removed unnecessary global main tag since pages are independent elements now -->
 
   <!-- TAB 1: 문제 개요 -->
   <div id="page-overview" class="page active">
@@ -418,7 +807,10 @@
       <div class="card-title">핵심 문제 범위 (Scope)</div>
       <table class="scope-table">
         <thead>
-          <tr><th>구분</th><th>내용</th></tr>
+          <tr>
+            <th>구분</th>
+            <th>내용</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
@@ -436,10 +828,13 @@
     <div class="card">
       <div class="card-title">문서 메타데이터</div>
       <div class="kv">
-        <div class="kv-row"><span class="kv-label">목적</span><span class="kv-val">B2B HR/성과관리 SaaS 솔루션의 시장 진입 근거 수립</span></div>
-        <div class="kv-row"><span class="kv-label">작성 기준</span><span class="kv-val">일반 중소기업(SME) 조직 구조 및 HR 시스템 한계 중심</span></div>
+        <div class="kv-row"><span class="kv-label">목적</span><span class="kv-val">B2B HR/성과관리 SaaS 솔루션의 시장 진입 근거
+            수립</span></div>
+        <div class="kv-row"><span class="kv-label">작성 기준</span><span class="kv-val">일반 중소기업(SME) 조직 구조 및 HR 시스템 한계
+            중심</span></div>
         <div class="kv-row"><span class="kv-label">버전</span><span class="kv-val">v1.3 (논리 구조 및 검증 지표 강화본)</span></div>
-        <div class="kv-row"><span class="kv-label">검증 단계</span><span class="kv-val">Problem-Solution Fit 탐색기</span></div>
+        <div class="kv-row"><span class="kv-label">검증 단계</span><span class="kv-val">Problem-Solution Fit 탐색기</span>
+        </div>
       </div>
     </div>
   </div>
@@ -487,14 +882,16 @@
         <div class="persona-icon">🧑‍💻</div>
         <div class="persona-role end-user">페르소나 A · End-User</div>
         <div class="persona-name">실무자</div>
-        <div class="persona-situation">프로젝트 파행을 막기 위해 선제적으로 유관 부서를 조율하고 이슈를 방어한다. 성과는 '아무 일도 일어나지 않은 것'으로 귀결되어 시스템에 기록되지 않는다.</div>
+        <div class="persona-situation">프로젝트 파행을 막기 위해 선제적으로 유관 부서를 조율하고 이슈를 방어한다. 성과는 '아무 일도 일어나지 않은 것'으로 귀결되어 시스템에 기록되지
+          않는다.</div>
         <div class="persona-pain">사고가 안 나게 미리 다 막아놨더니, 사람들은 내가 아무것도 안 한 줄 안다.</div>
       </div>
       <div class="persona-card">
         <div class="persona-icon">👔</div>
         <div class="persona-role buyer">페르소나 B · Economic Buyer</div>
         <div class="persona-name">의사결정권자 (CEO/HR)</div>
-        <div class="persona-situation">핵심 인재의 갑작스러운 퇴사 직후에야 조직 곳곳에서 파열음이 나며 그 빈자리를 체감한다. 인재 평가가 '직감'에 의존하는 한계를 인지하지만 대안이 없다.</div>
+        <div class="persona-situation">핵심 인재의 갑작스러운 퇴사 직후에야 조직 곳곳에서 파열음이 나며 그 빈자리를 체감한다. 인재 평가가 '직감'에 의존하는 한계를 인지하지만 대안이
+          없다.</div>
         <div class="persona-pain">누가 진짜 문제 해결사인지 직감에만 의존해야 하고, 퇴사 후에야 그 사람의 진짜 기여도를 알게 된다.</div>
       </div>
     </div>
@@ -512,28 +909,32 @@
           <div class="cause-num">1</div>
           <div>
             <div class="cause-title">👻 '투명 인간'이 되는 사전 예방 (Proactive Prevention)</div>
-            <div class="cause-desc">일정 지연을 막기 위해 요구사항을 미리 보완하고 유관 부서를 설득해 '사고를 방어한 성과'는 시스템에 남지 않는다. "이번엔 무난했네"라는 한마디에 치열했던 리스크 헷징 노력이 투명화된다.</div>
+            <div class="cause-desc">일정 지연을 막기 위해 요구사항을 미리 보완하고 유관 부서를 설득해 '사고를 방어한 성과'는 시스템에 남지 않는다. "이번엔 무난했네"라는 한마디에
+              치열했던 리스크 헷징 노력이 투명화된다.</div>
           </div>
         </div>
         <div class="cause-item">
           <div class="cause-num">2</div>
           <div>
             <div class="cause-title">🔥 '소방수' 딜레마 (Reactive Resolution)</div>
-            <div class="cause-desc">유능한 직원이 본업을 중단하고 돌발 위기 수습에 투입되어 회사를 구하더라도, 공식 평가엔 누락된다. 오히려 본업 지연에 따른 감점을 받는다. (원인 1+2 결합으로 '예방'도 '수습'도 할 동기를 상실)</div>
+            <div class="cause-desc">유능한 직원이 본업을 중단하고 돌발 위기 수습에 투입되어 회사를 구하더라도, 공식 평가엔 누락된다. 오히려 본업 지연에 따른 감점을 받는다. (원인
+              1+2 결합으로 '예방'도 '수습'도 할 동기를 상실)</div>
           </div>
         </div>
         <div class="cause-item">
           <div class="cause-num">3</div>
           <div>
             <div class="cause-title">🕳️ '빈틈 메우기'의 비극 (Role Overlap)</div>
-            <div class="cause-desc">성장기 중소기업에서 기획자가 CS를 하고 마케터가 영업을 지원하며 조직의 싱크홀을 메운다. 연말 평가는 "그래서 본업 성과는 뭔데?"라고 묻는다. 회사를 굴러가게 한 헌신이 '잡무'로 전락한다.</div>
+            <div class="cause-desc">성장기 중소기업에서 기획자가 CS를 하고 마케터가 영업을 지원하며 조직의 싱크홀을 메운다. 연말 평가는 "그래서 본업 성과는 뭔데?"라고 묻는다.
+              회사를 굴러가게 한 헌신이 '잡무'로 전락한다.</div>
           </div>
         </div>
         <div class="cause-item">
           <div class="cause-num">4</div>
           <div>
             <div class="cause-title">🎭 '보여주기' 생존 게임 (Impression Evaluation)</div>
-            <div class="cause-desc">실제 문제 해결 데이터를 추적할 수 없으니, 평가는 '야근 빈도'나 '빠른 대답' 같은 광학적 지표에 지배된다. 에이스는 번아웃되고, 사내 정치에 능한 인력만 살아남아 경영진의 '비즈니스 블라인드 스팟'을 키운다.</div>
+            <div class="cause-desc">실제 문제 해결 데이터를 추적할 수 없으니, 평가는 '야근 빈도'나 '빠른 대답' 같은 광학적 지표에 지배된다. 에이스는 번아웃되고, 사내 정치에 능한
+              인력만 살아남아 경영진의 '비즈니스 블라인드 스팟'을 키운다.</div>
           </div>
         </div>
       </div>
@@ -543,7 +944,11 @@
       <div class="card-title">문제의 비즈니스 임팩트 흐름</div>
       <table class="impact-table">
         <thead>
-          <tr><th>단계</th><th>영향 대상</th><th>인과 흐름 및 비즈니스 손실</th></tr>
+          <tr>
+            <th>단계</th>
+            <th>영향 대상</th>
+            <th>인과 흐름 및 비즈니스 손실</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
@@ -576,15 +981,18 @@
       <div class="comp-list">
         <div class="comp-item">
           <div class="comp-name">Jira, Asana 등 <span class="comp-tag">Task Management</span></div>
-          <div class="comp-limit"><strong>제품 철학의 한계:</strong> 이 툴들은 철저히 '계획된 결과(Task)'를 추적하기 위해 설계됨. 그 결과를 만들기 위해 과정에서 발생한 비공식적 설득, 갈등 조율, 방어적 성과를 담아낼 구조적 바구니가 없음.</div>
+          <div class="comp-limit"><strong>제품 철학의 한계:</strong> 이 툴들은 철저히 '계획된 결과(Task)'를 추적하기 위해 설계됨. 그 결과를 만들기 위해 과정에서
+            발생한 비공식적 설득, 갈등 조율, 방어적 성과를 담아낼 구조적 바구니가 없음.</div>
         </div>
         <div class="comp-item">
           <div class="comp-name">전통적 MBO/KPI 시스템 <span class="comp-tag">Performance Mgmt</span></div>
-          <div class="comp-limit"><strong>환경 불일치:</strong> 연초의 정적(Static) 목표 관리 체계는 수시로 소방수가 되어야 하는 중소기업의 동적(Dynamic) 실무 환경을 담아내지 못함.</div>
+          <div class="comp-limit"><strong>환경 불일치:</strong> 연초의 정적(Static) 목표 관리 체계는 수시로 소방수가 되어야 하는 중소기업의 동적(Dynamic) 실무
+            환경을 담아내지 못함.</div>
         </div>
         <div class="comp-item">
           <div class="comp-name">Excel / Notion <span class="comp-tag">Personal Docs</span></div>
-          <div class="comp-limit"><strong>데이터 사일로(Data Silo):</strong> 개인이 임의로 기록하더라도 전사 표준 지표로 통합되지 않아, 경영진이 교차 검증하고 인사 의사결정에 활용할 수 없는 파편화된 메모에 불과함.</div>
+          <div class="comp-limit"><strong>데이터 사일로(Data Silo):</strong> 개인이 임의로 기록하더라도 전사 표준 지표로 통합되지 않아, 경영진이 교차 검증하고 인사
+            의사결정에 활용할 수 없는 파편화된 메모에 불과함.</div>
         </div>
       </div>
     </div>
@@ -604,7 +1012,8 @@
       </div>
       <div class="value-box buyer-box">
         <div class="value-box-title">👔 경영진/기업 (Buyer) ROI</div>
-        <div class="value-item"><strong>리텐션 방어:</strong> 보이지 않는 에이스를 조기 식별 → SHRM 추산 '직원 교체 비용(연봉의 최대 200%)' 직접 세이브</div>
+        <div class="value-item"><strong>리텐션 방어:</strong> 보이지 않는 에이스를 조기 식별 → SHRM 추산 '직원 교체 비용(연봉의 최대 200%)' 직접 세이브
+        </div>
         <div class="value-item"><strong>Rework 비용 절감:</strong> 예방 업무 보상 체계 마련 → 사고 발생 후 재작업 리소스 및 납기 지연 페널티 사전 차단</div>
         <div class="value-item"><strong>의사결정 고도화:</strong> 직감 의존에서 데이터 기반 인사 의사결정으로 전환</div>
       </div>
@@ -617,7 +1026,8 @@
           <div style="font-size:28px; font-weight:800; color:var(--red);">200%</div>
           <div style="font-size:11px; color:var(--t3); margin-top:4px;">퇴사자 1인당<br>교체 비용 (연봉 대비, SHRM)</div>
         </div>
-        <div style="text-align:center; padding:12px; border-left:1px solid var(--bd); border-right:1px solid var(--bd);">
+        <div
+          style="text-align:center; padding:12px; border-left:1px solid var(--bd); border-right:1px solid var(--bd);">
           <div style="font-size:28px; font-weight:800; color:var(--amber);">0</div>
           <div style="font-size:11px; color:var(--t3); margin-top:4px;">현재 비공식 기여를<br>측정하는 시스템</div>
         </div>
@@ -672,35 +1082,39 @@
       <div class="card-title">우선순위 액션 플랜</div>
       <div class="kv">
         <div class="kv-row">
-          <span class="kv-label" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);color:var(--red);">즉시</span>
+          <span class="kv-label"
+            style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);color:var(--red);">즉시</span>
           <span class="kv-val">실무자 5~10인 심층 인터뷰 설계 및 대상자 섭외 시작 — "지금 성과를 어떻게 증명하고 있나?" 핵심 질문 중심</span>
         </div>
         <div class="kv-row">
-          <span class="kv-label" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:var(--amber);">단기</span>
+          <span class="kv-label"
+            style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:var(--amber);">단기</span>
           <span class="kv-val">CEO/HR 의사결정권자 3~5인 인터뷰 — "에이스 퇴사 후 실제 비용 규모"와 WTP(Willingness to Pay) 탐색</span>
         </div>
         <div class="kv-row">
-          <span class="kv-label" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);">중기</span>
+          <span class="kv-label"
+            style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);">중기</span>
           <span class="kv-val">인터뷰 인사이트 기반 MVP 프로토타입 제작 및 핵심 가설(LLM 기여도 변환) 기술 검증</span>
         </div>
       </div>
     </div>
   </div>
 
-</main>
+  <!-- End Main Tag Removed -->
 
-<script>
-  function switchTab(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    event.target.classList.add('active');
-  }
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      event.target.classList.add('active');
+    }
 
-  function toggleMode() {
-    const isLight = document.body.classList.toggle('light');
-    document.getElementById('toggle-btn').textContent = isLight ? '☀️ 라이트' : '🌙 다크';
-  }
-</script>
+    function toggleMode() {
+      const isLight = document.body.classList.toggle('light');
+      document.getElementById('toggle-btn').textContent = isLight ? '☀️ 라이트' : '🌙 다크';
+    }
+  </script>
 </body>
+
 </html>

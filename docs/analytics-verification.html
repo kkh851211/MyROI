@@ -2391,9 +2391,9 @@
   <script>
     // ── 탭 전환
     const TABS = ['page-0', 'page-1', 'page-2', 'page-3', 'page-4'];
-    document.querySelectorAll('.tab').forEach((tab, i) => {
+    document.querySelectorAll('.tab-btn').forEach((tab, i) => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById(TABS[i]).classList.add('active');

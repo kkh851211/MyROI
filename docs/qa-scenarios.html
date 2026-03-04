@@ -1187,7 +1187,8 @@
             </div>
           </div>
           <div style="font-size:11px;color:var(--t3);">트래킹: <code>issue_input_started</code> ·
-            <code>issue_input_completed</code> · <code>ai_analysis_triggered</code></div>
+            <code>issue_input_completed</code> · <code>ai_analysis_triggered</code>
+          </div>
         </div>
       </div>
 
@@ -1247,7 +1248,8 @@
             </div>
           </div>
           <div style="font-size:11px;color:var(--t3);">트래킹: <code>ai_result_displayed</code> ·
-            <code>ai_analysis_failed</code></div>
+            <code>ai_analysis_failed</code>
+          </div>
         </div>
       </div>
 
@@ -1338,7 +1340,8 @@
             <div class="crit-item warn"><span class="crit-icon">⚠️</span>
               <div>
                 <div class="crit-text">월 1회 무료 한도 초과 시 "이번 달 무료 생성 횟수를 사용했습니다" 팝업 + 유료 플랜 유도 CTA 표시.
-                  <code>upgrade_prompt_shown</code> 이벤트 발화.</div>
+                  <code>upgrade_prompt_shown</code> 이벤트 발화.
+                </div>
               </div>
             </div>
             <div class="crit-item pass"><span class="crit-icon">✅</span>
@@ -1353,7 +1356,8 @@
             </div>
           </div>
           <div style="font-size:11px;color:var(--t3);">트래킹: <code>pitchdeck_generated</code> ·
-            <code>pdf_downloaded</code> · <code>link_shared</code> · <code>upgrade_prompt_shown</code></div>
+            <code>pdf_downloaded</code> · <code>link_shared</code> · <code>upgrade_prompt_shown</code>
+          </div>
         </div>
       </div>
 
@@ -1398,7 +1402,8 @@
             </div>
           </div>
           <div style="font-size:11px;color:var(--t3);">트래킹: <code>vault_viewed</code> · <code>issue_edited</code> ·
-            <code>issue_deleted</code></div>
+            <code>issue_deleted</code>
+          </div>
         </div>
       </div>
 
@@ -2466,9 +2471,9 @@
   <script>
     // ── Tab 전환
     const TABS = ['page-0', 'page-1', 'page-2', 'page-3', 'page-4'];
-    document.querySelectorAll('.tab').forEach((tab, i) => {
+    document.querySelectorAll('.tab-btn').forEach((tab, i) => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById(TABS[i]).classList.add('active');
